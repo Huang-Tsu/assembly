@@ -5,20 +5,33 @@
 	.align 4
 
 /* --- variable a --- */
-	.type a, %object
-	.size a, 8
-a:
-	.word 1
-	.word 2
+	.type A, %object
+	.size A, 32	;save 8 bytes for matrix A
+A:
+	.word 1 ;[1,1]
+	.word 2 ;[1,2]
+	.word 3 
+	.word 4 ;[1,4]
+	.word 5 ;[2,1]
+	.word 6
+	.word 7
+	.word 8 ;[2,4]
 
 /* --- variable b --- */
-	.type b, %object
-	.size b, 4
-b:
+	.type B, %object
+	.size B, 32 ;save 8 bytes for matrix B
+B:
+	.word 8 ;[1,1]
+	.word 7 ;[1,2]
+	.word 7 ;[2,1]
+	.word 6 ;[2,2]
+	.word 4
 	.word 3
+	.word 2 ;[4,1]
+	.word 1 ;[4,2]
 
-c:
-	.space 8, 0
+C:
+	.space 16, 0 ;save 4 bytes for matrix C
 
 /* ========================= */
 /*       TEXT section        */
