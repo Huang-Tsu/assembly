@@ -4,7 +4,7 @@
 
 NumSort:
 	/* functnio start */
-	STMFD sp!,{r0-r9, fp, ip, lr}
+	STMFD sp!, {r0-r9, fp, ip, lr}
 
 	/* --- function begin --- */
 
@@ -20,5 +20,5 @@ NumSort:
 
 
 	/* --- function end --- */
-	LDMFD sp!,{r0-r9, fp, ip, pc}
+	LDMFD sp!, {r0-r9, fp, ip, pc}
 	.end
