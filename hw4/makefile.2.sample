@@ -1,0 +1,12 @@
+COMPILE = arm-none-eabi-gcc
+option = -g -O0
+obj = $(wildcard *.s)
+tar = $(patsubst %.s,%.exe,$(obj))
+
+all:$(tar)
+
+%.exe : %.s
+	$(COMPILE) $(option) $< -o $@
+	
+clean:
+	rm -rf *.exe
