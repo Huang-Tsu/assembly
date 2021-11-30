@@ -3,32 +3,34 @@
 /* ========================= */
 	.data
 	.align 4
-
-/* --- variable a --- */
-	.type A, %object
-	.size A, 32	//save 32 bytes for matrix A
-A:
-	.word 1 //[1,1]
-	.word 2 //[1,2]
-	.word 3 
-	.word 4 //[1,4]
-	.word 5 //[2,1]
-	.word 6
-	.word 7
-	.word 8 //[2,4]
-
-/* --- variable b --- */
-	.type B, %object
-	.size B, 32 //save 32 bytes for matrix B
-B:
-	.word 8 //[1,1]
-	.word 7 //[1,2]
-	.word 7 //[2,1]
-	.word 6 //[2,2]
+/* --- input array --- */
+	.type input_array, %object
+	.size input_array, 400	//save 400(100 numbers) bytes for input array
+input_array:
+	.word 123
+	.word 423
+	.word 98123
+	.word 1231
+	.word 1111
+	.word 2222
+	.word 1212
+	.word 12389124
+	.word 123111
+	.word 52341
+	.word 51341234
+	.word 1
+	.word 5
 	.word 4
-	.word 3
-	.word 2 //[4,1]
-	.word 1 //[4,2]
+	.word 123
+	.word 1233
+	.word 9191
+	.word 919
+	.word 19231
+	.word 1291
+	.word 923852
+	.word 999
+	.word 0
+
 /* ========================= */
 /*       TEXT section        */
 /* ========================= */
@@ -36,17 +38,19 @@ B:
 	.global main
 	.type main,%function
 
+.input_array:
+	.word input_array
 main:
 	MOV ip, sp
-	STDFD sp!,{fp, ip, lr, pc}
+	STMFD sp!,{fp, ip, lr, pc}
 	SUB fp, ip, #4
 
-	/* prepare input array */
-	//...
 
 	/* put array size into r9 */
+	mov r9, #23
 
 	/* put array address into r10 */
+	ldr r10, .input_array
 
 	bl NumSort
 	/* --- end of NumSort --- */

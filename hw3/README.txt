@@ -7,4 +7,4 @@ Features of my code:
 	在每個區段當中，首先將兩個registers初始為該次computation要的row 和 column的起始點，並將一個register初始為0，用來紀錄相對應的row, column相乘的值加總，相對應的元素都相乘完並加總後，將其放到該區段要compute的entry of matrix C
 		特別的是，matrix A相乘完後要+4，而matrix要+8，因為matrix A的下一個entry在右邊，而matrix 要相乘的下一個entry在他的下面，中間還隔了一個值，故要+8。
 
-	
+ 
