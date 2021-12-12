@@ -12,10 +12,9 @@
 	.type NumSort,%function
 NumSort:
 	/* functnio start */
-//	mov ip, sp
-//	STMFD sp!, {r4-r10, fp, ip, lr, pc}
-//	sub fp, ip, #4
-STMFD sp!, {r4-r9, fp, ip, lr}
+	mov ip, sp
+	STMFD sp!, {r4-r10, fp, ip, lr, pc}
+	sub fp, ip, #4
 
 	/* --- function begin --- */
 
@@ -26,8 +25,8 @@ STMFD sp!, {r4-r9, fp, ip, lr}
 	mov r10, r1
 
 		/* allocate memory space for output_array */
-	mov r0, r0, lsl #2		//the bytes we need are array_size * 4
-	add r0, r0, #4				//prepare extra space for safe
+	mov r7, r0, lsl #2		//the bytes we need are array_size * 4
+	//add r0, r0, #4				//prepare extra space for safe
 	bl malloc		//return address will store in r0
 		/* copy input_array to output_array */
 	mov r1, r0
@@ -35,7 +34,8 @@ STMFD sp!, {r4-r9, fp, ip, lr}
 LOOP_INIT:
 	ldr r3, [r10], #4		//copy input_array[r4] to output_array[r4], and let it point to the next idx
 	str r3, [r1], #4 	//put the value get from input_array to output_array, and let output_array point to next idx	
-	add r4, r4, #1	//add counter 1
+	//add r4, r4, #1	//add counter 1
+		add r4, #1
 	cmp r4, r9			//compare counter with array size
 	bne LOOP_INIT		//if not equal, do it again, until 23 times
 
@@ -72,11 +72,10 @@ LOOP_INIT:
 		bne LOOP_BUBBLE_OUTER		//if not equal, do it again, until 23 times
 	/* ------ End NumSort ------ */
 
-		/* put result array's address into r1 */
-	mov r1, r0
+		/* put result array's address into r0 */
+	mov r0, r0
 
 
 		/* --- function end --- */
-	//LDMEA fp, {r4-r10, fp, sp, pc}
-	LDMFD sp!, {r4-r9, fp, ip, pc}
+	LDMEA fp, {r4-r10, fp, sp, pc}
 	.end
