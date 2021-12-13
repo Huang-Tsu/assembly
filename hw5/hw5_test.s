@@ -2,23 +2,6 @@
 /*       DATA section        */
 /* ========================= */
 	.data
-	.align 4
-/* --- input array --- */
-	.type input_array, %object
-	.size input_array, 400	//save 400(100 numbers) bytes for input array
-.input_format_start:
-	.asciz "Input array: %d"
-.input_format_middle:
-	.asciz ", %d"
-
-.output_format_start:
-	.asciz "Output array: %d\000"
-.output_format_middle:
-	.asciz ", %d\000"
-
-.print_next_line:
-	.asciz "\n\000"
-
 .input_array:
 	.word 123
 	.word 423
@@ -43,14 +26,23 @@
 	.word 923852
 	.word 999
 	.word 0
+input_start:
+	.asciz "Input array: \000"
+format_middle:
+	.asciz "%d, \000"
+result_start:
+	.asciz "Result array: \000"
+new_line:
+	.asciz "%d\n\000"
+
 
 /* ========================= */
 /*       TEXT section        */
 /* ========================= */
 	.section .text
 	.global main
+	.extern printf
 	.type main,%function
-
 
 main:
 	MOV ip, sp
@@ -58,75 +50,66 @@ main:
 	SUB fp, ip, #4
 
 
+		/* ---------------print input array-----------------*/
+			//print initial format
+	ldr r0, =input_start
+	bl printf
+
+			//print the numbers between start and end.
+	mov r5, #0	//use r5 as counter, start from second value
+PRINTF_INPUT_ARRAY:
+	ldr r9, =.input_array
+	add r9, r9, r5, lsl #2	//get the address of wanted value, that is, initial addaress + offset
+	ldr r0, =format_middle
+	ldr r1, [r9]	//get value
+	bl printf
+
+	add r5, #1
+	cmp r5, #22		//compare r5 with array_size
+	bne PRINTF_INPUT_ARRAY
+		
+		//print new_line
+	ldr r9, =.input_array
+	ldr r0, =new_line
+	ldr r1, [r9, #88]	//get the value of final address
+	bl printf
+
 		/* put array size into r0 */
 	mov r0, #23
 
 		/* put array address into r1 */
 	ldr r1, =.input_array
+		/*-------------- end print input array------------*/
 
 	bl NumSort
 
-		/*
-			 r0:format fof printf()
-			 r1:input value of printf()
-			 r5:counter for LOOP for printf()
-			 r6:offset
-			 r7:address of value now
-			 r9:starting address of input array
-			 r10:start address of output array
-		*/
-	ldr r9, =.input_array		//r9 point to input array
-	mov r10, r0 					//r10 point ot output array
 			/* --- print result --- */
-		/* print input array */
-			//print initial format
-	ldr r0, =.input_format_start
-	ldr r1, [r9] 	//get first element of input_array and move forward one word-size
-	bl printf
-
-			//print the numbers between start and end.
-	mov r5, #1	//use r5 as counter, start from second value
-PRINTF_INPUT_ARRAY:
-	mov r6, r5, lsl #2 //r6:offest from starting address of input array
-	ldr r9, =.input_array
-	add r7, r9, r6	//get the address of wanted value, that is, initial addaress + offset
-	ldr r0, =.input_format_middle
-	ldr r1, [r7]	//get value
-	bl printf
-
-	add r5, #1
-	cmp r5, #23		//compare r5 with array_size
-	bne PRINTF_INPUT_ARRAY
-		
-		//print new_line
-	ldr r0, =.print_next_line
-	bl printf
-
-	
-	
+	mov r10, r0 					//r10 point ot output array
 
 		/* print output array */
 			//print initial format
-	ldr r0, =.output_format_start
-	ldr r1, [r1] 	//get first element of input_array and move forward one word-size
+	mov r8, r10	//r8:temp initial address of result array
+	ldr r0, =result_start
 	bl printf
 
 			//print the numbers between start and end.
-	mov r5, #1	//use r5 as counter, start from second value
+	mov r5, #0	//use r5 as counter, start from first value
 PRINTF_OUTPUT_ARRAY:
-	mov r6, r5, lsl #2 //r6:offest from starting address of input array
 	//ldr r9, =.input_array
-	add r7, r10, r6	//get the address of wanted value, that is, initial addaress + offset
-	ldr r0, =.output_format_middle
-	ldr r1, [r7]	//get value
+	mov r8, r10			//
+	add r8, r8, r5, lsl #2	//get the address of wanted value, that is, initial addaress + offset
+	ldr r0, =format_middle
+	ldr r1, [r8]	//get value
 	bl printf
 
 	add r5, #1
-	cmp r5, #23		//compare r5 with array_size
+	cmp r5, #22		//compare r5 with array_size-1, because I will only print 22 numbers, and left the final one in the end
 	bne PRINTF_OUTPUT_ARRAY
 		
 		//print new_line
-	ldr r0, =.print_next_line
+	mov r8, r10
+	ldr r0, =new_line
+	ldr r1,	[r8, #88] //get the value of final address
 	bl printf
 
 	nop

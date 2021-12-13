@@ -26,7 +26,6 @@ NumSort:
 
 		/* allocate memory space for output_array */
 	mov r7, r0, lsl #2		//the bytes we need are array_size * 4
-	//add r0, r0, #4				//prepare extra space for safe
 	bl malloc		//return address will store in r0
 		/* copy input_array to output_array */
 	mov r1, r0
@@ -34,7 +33,6 @@ NumSort:
 LOOP_INIT:
 	ldr r3, [r10], #4		//copy input_array[r4] to output_array[r4], and let it point to the next idx
 	str r3, [r1], #4 	//put the value get from input_array to output_array, and let output_array point to next idx	
-	//add r4, r4, #1	//add counter 1
 		add r4, #1
 	cmp r4, r9			//compare counter with array size
 	bne LOOP_INIT		//if not equal, do it again, until 23 times
