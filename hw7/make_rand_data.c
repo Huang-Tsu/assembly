@@ -12,7 +12,7 @@ int main(){
 	for(i=0; i<400; i++){
 		for(j=0; j<198; j++){
 			data = random();	
-			test = (float)(11.0*((double)data*GOLDEN_RATIO - (int)((double)data*GOLDEN_RATIO)));
+			test = (int)(11.0*((double)data*GOLDEN_RATIO - (int)((double)data*GOLDEN_RATIO)));
 			//fprintf(fptr, "%ld ", random() & ((1<<4)-1));
 			fprintf(fptr, "%f ", test);
 		}

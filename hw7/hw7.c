@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <string.h>
 
 typedef struct timespec timespec;
 timespec diff(timespec start, timespec end);
@@ -19,13 +20,11 @@ int main(){
 	float c[200]__attribute__((aligned));
 
 		
-		//initialize b_column_total[] & c[]
-	for(i=0; i<198; i++){
-		b_column_total[i] = 0;
-		c[i] = 0;
-	}
-
 		clock_gettime(CLOCK_MONOTONIC, &time_start);
+		//initialize b_column_total[] & c[]
+	memset(b_column_total, 0, 198*sizeof(float));
+	memset(c, 0, 198*sizeof(float));
+
 			//input data.txt
 		//build A
 	for(i=0; i<200; i++){
