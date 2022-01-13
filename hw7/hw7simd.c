@@ -101,8 +101,9 @@ int main(){
 	for(i=0; i<200; i++){
 		for(j=0; j*4+7<200; j+=2){
 			*temp_total = _mm_add_ps(_mm_mul_ps(A[i][j], B[0][j]), _mm_mul_ps(A[i][j+1], B[0][j+1]));
+				//=>把vector a1(4個float, ROWi of A 的j~j+3 column)跟vector b1(Row0 of B(該column的總和) 的j~j+3 column)相乘，再把第二個vector a2 b2相乘，然後把vector a1b1 和vector a2b2加起來，得到vector temp
 			for(int k=0; k<4; k++){
-				c[i] += temp[k];
+				c[i] += temp[k];	//，把上面得到的vector temp裡的4個float + 到c[i]裡面
 			}
 		}
 	}
