@@ -22,9 +22,8 @@ int main(){
 		
 		clock_gettime(CLOCK_MONOTONIC, &time_start);
 		//initialize b_column_total[] & c[]
-	memset(b_column_total, 0, 198*sizeof(float));
-	memset(c, 0, 198*sizeof(float));
-
+	for(i=0; i<200; i++)
+		c[i] = 0;
 			//input data.txt
 		//build A
 	for(i=0; i<200; i++){
@@ -87,7 +86,8 @@ int main(){
 		time_diff[2][1] = diff(time_start, time_end).tv_nsec;
 
 	for(i=0; i<3; i++){
-		fprintf(fptr, "%d.%d\n", time_diff[i][0], time_diff[i][1]);
+		time_diff[i][0] = time_diff[i][0]*1000000000+time_diff[i][1];
+		fprintf(fptr, "%f\n", time_diff[i][0]/1000000000.0);
 	}
 	fclose(fptr);
 	

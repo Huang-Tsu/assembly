@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <xmmintrin.h> 	//_mm_setzero_ps()
+#include <pmmintrin.h>	//_mm_hadd_ps()
 
 typedef struct timespec timespec;
 timespec diff(timespec start, timespec end);
@@ -16,26 +17,25 @@ int main(){
 	
 	float **a = (float**)calloc(200, sizeof(float*));
 	float **b = (float**)calloc(200, sizeof(float*));
-	float b_column_total[198]__attribute__((aligned(16)));		//store the total value of each column in b
+	float temp[4]__attribute__((aligned(16)));		//store the total value of each column in b
 	float c[200]__attribute__((aligned(16)));
-	float temp[4] __attribute__((aligned(16)));
-	float temp1[4] __attribute__((aligned(16)));
 	for(i=0; i<200; i++){
-		a[i] = (float*)calloc(198, sizeof(float));	//calloc will align 16 bytes
-		b[i] = (float*)calloc(198, sizeof(float));
+		a[i] = (float*)calloc(200, sizeof(float));	//calloc will align 16 bytes
+		b[i] = (float*)calloc(200, sizeof(float));
 	}
 	__m128 **A = (__m128**)a;
 	__m128 **B = (__m128**)b;
-	__m128 *B_total = (__m128*)b_column_total;
-	__m128 *C = (__m128*)c;
 	__m128 *temp_total = (__m128*)temp;
-	__m128 *temp_total1 = (__m128*)temp1;
+	__m128 *C = (__m128*)c;
 
 		
 		clock_gettime(CLOCK_MONOTONIC, &time_start);
 		//initialize b_column_total[] & c[]
-	*B_total = _mm_setzero_ps();
-	*C = _mm_setzero_ps();
+	for(i=0; i<200; i++){
+		c[i] = 0;
+	}
+	//*B_total = _mm_setzero_ps();
+	//*C = _mm_setzero_ps();
 
 			//input data.txt
 		//build A
@@ -86,19 +86,24 @@ int main(){
 		}
 	}
 	*/
-					for(i=1; i<200; i++){
-						for(j=0; (j+1)*4<198; j++){
-							B[0][j] = _mm_add_ps(B[0][j], B[i][j]);
-								printf("i:%d, j:%d\n", i, j);
-								for(int k=0; k<4; k++){
-									printf("b[0][%d]:%f\n", j*4+k, b[0][j*4+k]);
-								}
-						}
-					}
+		for(i=1; i<200; i++){
+			for(j=0; j*4+3<200; j++){
+				B[0][j] = _mm_add_ps(B[0][j], B[i][j]);
+				//printf("i:%d, j:%d\n", i, j);
+				/*
+					 for(int k=0; k<4; k++){
+						printf("b[0][%d]:%f\n", j*4+k, b[0][j*4+k]);
+					 }
+					 */
+			}
+		}
 
 	for(i=0; i<200; i++){
-		for(j=0; j<198; j++){
-			c[i] +=  a[i][j]*b[0][j];
+		for(j=0; j*4+7<200; j+=2){
+			*temp_total = _mm_add_ps(_mm_mul_ps(A[i][j], B[0][j]), _mm_mul_ps(A[i][j+1], B[0][j+1]));
+			for(int k=0; k<4; k++){
+				c[i] += temp[k];
+			}
 		}
 	}
 		clock_gettime(CLOCK_MONOTONIC, &time_end);
@@ -113,9 +118,9 @@ int main(){
 		clock_gettime(CLOCK_MONOTONIC, &time_end);
 		time_diff[2][0] = diff(time_start, time_end).tv_sec;
 		time_diff[2][1] = diff(time_start, time_end).tv_nsec;
-
 	for(i=0; i<3; i++){
-		fprintf(fptr, "%d.%d\n", time_diff[i][0], time_diff[i][1]);
+		time_diff[i][0] = time_diff[i][0]*1000000000+time_diff[i][1];
+		fprintf(fptr, "%f\n", time_diff[i][0]/1000000000.0);
 	}
 	fclose(fptr);
 
