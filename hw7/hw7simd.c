@@ -18,8 +18,8 @@ int main(){
 	float **b = (float**)calloc(200, sizeof(float*));
 	float b_column_total[198]__attribute__((aligned(16)));		//store the total value of each column in b
 	float c[200]__attribute__((aligned(16)));
-	float temp[4] __attribute__((aliigned(16)));
-	float temp1[4] __attribute__((aliigned(16)));
+	float temp[4] __attribute__((aligned(16)));
+	float temp1[4] __attribute__((aligned(16)));
 	for(i=0; i<200; i++){
 		a[i] = (float*)calloc(198, sizeof(float));	//calloc will align 16 bytes
 		b[i] = (float*)calloc(198, sizeof(float));
@@ -86,22 +86,19 @@ int main(){
 		}
 	}
 	*/
-					for(i=0; i<2; i+=2){
+					for(i=1; i<200; i++){
 						for(j=0; (j+1)*4<198; j++){
-							B_total[j] = _mm_add_ps(B[i][j], B[i+1][j]);
-									printf("B[%d][%d]:%p, B[%d][%d]:%p\n", i, j, &B[i][j], i+1, j, &B[i+1][j]);
+							B[0][j] = _mm_add_ps(B[0][j], B[i][j]);
 								printf("i:%d, j:%d\n", i, j);
 								for(int k=0; k<4; k++){
-									printf("b_total[%d]:%f\n", j*4+k, b_column_total[j*4+k]);
+									printf("b[0][%d]:%f\n", j*4+k, b[0][j*4+k]);
 								}
 						}
-						printf("b[0][34]:%f, b[1][34]:%f\n", b[0][34], b[1][34]);
-									printf("B[%d][%d]:%p, B[%d][%d]:%p\n", i, j, B[i], i+1, j, B[i+1]);
 					}
 
 	for(i=0; i<200; i++){
 		for(j=0; j<198; j++){
-			c[i] +=  a[i][j]*b_column_total[j];
+			c[i] +=  a[i][j]*b[0][j];
 		}
 	}
 		clock_gettime(CLOCK_MONOTONIC, &time_end);

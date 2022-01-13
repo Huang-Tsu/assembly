@@ -62,15 +62,15 @@ int main(){
 				//						 + A[i][0]*B[200][0] + A[i][1]*B[200][1] + ... + A[i][197]*B[200][197]	//i row of A * 200 row of B
 				//thus	  c[i] = A[i][0]*(B[0][0]+B[1][0]+...+B[200][0]) + A[i][1]*(B[0][1]+B[1][1]+...+B[200][1]) + ... + A[i][197]*(B[0][197]+B[1][197]+...+B[200][197]) 	
 				//						 = A[i][0]*(sum of coloumn 0 of b) + A[i][1](sum of coloumn 1 of b) + ... + A[i][1](sum of coloumn 197 of b)
-	for(i=0; i<200; i++){
+	for(i=1; i<200; i++){
 		for(j=0; j<198; j++){
-			b_column_total[j] += b[i][j];
+			b[0][j] += b[i][j];
 		}
 	}
 
 	for(i=0; i<200; i++){
 		for(j=0; j<198; j++){
-			c[i] +=  a[i][j]*b_column_total[j];
+			c[i] +=  a[i][j]*b[0][j];
 		}
 	}
 		clock_gettime(CLOCK_MONOTONIC, &time_end);
