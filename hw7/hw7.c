@@ -11,84 +11,84 @@ int main(){
 	int i, j;
 	timespec time_start, time_end;
 	int time_diff[3][2];	//time_diff[input, process, output][tv_sec, tv_nsec]
-
-	fptr = fopen("data.txt", "r");
 	
 	float a[200][198]__attribute__((aligned));
 	float b[200][198]__attribute__((aligned));
-	float b_column_total[198]__attribute__((aligned));		//store the total value of each column in b
 	float c[200]__attribute__((aligned));
 
 		
-		clock_gettime(CLOCK_MONOTONIC, &time_start);
-		//initialize b_column_total[] & c[]
-	for(i=0; i<200; i++)
+	clock_gettime(CLOCK_MONOTONIC, &time_start);
+	fptr = fopen("data.txt", "r");
+
+		//initialize c[]
+	for(i=0; i<200; i++){
 		c[i] = 0;
-			//input data.txt
-		//build A
+	}
+	
+//============== read data form data.txt ==========
+		//build matrix A
 	for(i=0; i<200; i++){
 		for(j=0; j<198; j++){
 			fscanf(fptr, "%e", &a[i][j]);	//read first 200 row in data.txt
 		}
 	}
-		//build B
+		//build matrix B
 	for(i=0; i<200; i++){
 		for(j=0; j<198; j++){
 			fscanf(fptr, "%e", &b[i][j]);	//read 201~400 row in data.txt
 		}
 	}
-	
 		clock_gettime(CLOCK_MONOTONIC, &time_end);
+			//count and store time_diff
 		time_diff[0][0] = diff(time_start, time_end).tv_sec;
 		time_diff[0][1] = diff(time_start, time_end).tv_nsec;
 		
 	fclose(fptr);
 
-	//============== caculate result ===================
+//============== caculate result ===================
 	fptr = fopen("output.txt", "w+");
 
 		clock_gettime(CLOCK_MONOTONIC, &time_start);
-		//caculate total of each column
-				//because C[i] = A[i][0]*B[0][0] + A[i][1]*B[0][1] + ... + A[i][197]*B[0][197]	//i row of A * 0 row of B
-				//						 + A[i][0]*B[1][0] + A[i][1]*B[1][1] + ... + A[i][197]*B[1][197]	//i row of A * 1 row of B
-				//						 + A[i][0]*B[2][0] + A[i][1]*B[2][1] + ... + A[i][197]*B[2][197]	//i row of A * 2 row of B
-				//						 + A[i][0]*B[3][0] + A[i][1]*B[3][1] + ... + A[i][197]*B[3][197]	//i row of A * 3 row of B
-				//						 +
-				//						 .
-				//						 .
-				//						 .
-				//						 +
-				//						 + A[i][0]*B[200][0] + A[i][1]*B[200][1] + ... + A[i][197]*B[200][197]	//i row of A * 200 row of B
-				//thus	  c[i] = A[i][0]*(B[0][0]+B[1][0]+...+B[200][0]) + A[i][1]*(B[0][1]+B[1][1]+...+B[200][1]) + ... + A[i][197]*(B[0][197]+B[1][197]+...+B[200][197]) 	
-				//						 = A[i][0]*(sum of coloumn 0 of b) + A[i][1](sum of coloumn 1 of b) + ... + A[i][1](sum of coloumn 197 of b)
+			//caculate total value of each column of B
 	for(i=1; i<200; i++){
 		for(j=0; j<198; j++){
 			b[0][j] += b[i][j];
 		}
+			//說明:在READEME.txt當中詳細說明
+				//	c[i] = A[i][0]*(B[0][0]+B[1][0]+...+B[200][0]) + A[i][1]*(B[0][1]+B[1][1]+...+B[200][1]) + ... + A[i][197]*(B[0][197]+B[1][197]+...+B[200][197]) 	
+				//			 = A[i][0]*(sum of coloumn 0 of b) + A[i][1](sum of coloumn 1 of b) + ... + A[i][1](sum of coloumn 197 of b)
 	}
 
+			//compute c[i]
 	for(i=0; i<200; i++){
 		for(j=0; j<198; j++){
-			c[i] +=  a[i][j]*b[0][j];
+			c[i] +=  a[i][j]*b[0][j];	//each row of A mul corresponding value of total colum of B
 		}
 	}
 		clock_gettime(CLOCK_MONOTONIC, &time_end);
+			//count and store time_diff
 		time_diff[1][0] = diff(time_start, time_end).tv_sec;
 		time_diff[1][1] = diff(time_start, time_end).tv_nsec;
 
-		clock_gettime(CLOCK_MONOTONIC, &time_start);
-		//outupt
+// =============== output ==============
+	clock_gettime(CLOCK_MONOTONIC, &time_start);
 	for(i=0; i<200; i++){
 		fprintf(fptr, "%f\n", c[i]);
 	}
 		clock_gettime(CLOCK_MONOTONIC, &time_end);
+			//count and store time_diff
 		time_diff[2][0] = diff(time_start, time_end).tv_sec;
 		time_diff[2][1] = diff(time_start, time_end).tv_nsec;
 
+		//print time
+	puts("C program without SIMD:");
+	printf("\tread time:\tcompute time:\twrite time:\n");
 	for(i=0; i<3; i++){
 		time_diff[i][0] = time_diff[i][0]*1000000000+time_diff[i][1];
-		fprintf(fptr, "%f\n", time_diff[i][0]/1000000000.0);
+		printf("\t%f", time_diff[i][0]/1000000000.0);
 	}
+	puts("");
+
 	fclose(fptr);
 	
 	return 0;
