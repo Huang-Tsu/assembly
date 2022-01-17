@@ -18,6 +18,7 @@ int main(){
 	float temp[4]__attribute__((aligned(16)));		//will be used later in computing c[i]
 	float c[200]__attribute__((aligned(16)));
 
+	temp[0] = temp[1] = temp[2] = temp[3] = 0.0;
 	for(i=0; i<200; i++){
 					//calloc will align 16 bytes
 		a[i] = (float*)calloc(200, sizeof(float));		//allocate 200 float for each row
@@ -57,7 +58,7 @@ int main(){
 	fclose(fptr);
 
 //============== caculate result ===================
-	fptr = fopen("output_simd.txt", "w+");
+	fptr = fopen("output_simd_new.txt", "w+");
 
 		clock_gettime(CLOCK_MONOTONIC, &time_start);
 			//caculate total value of each column of B
@@ -72,13 +73,14 @@ int main(){
 
 			//compute c[i]
 	for(i=0; i<200; i++){
-		for(j=0; j*4+7<200; j+=2){
-			*temp_total = _mm_add_ps(*temp_total, _mm_add_ps(_mm_mul_ps(A[i][j], B[0][j]), _mm_mul_ps(A[i][j+1], B[0][j+1])));
+		for(j=0; j<200/4; j++){
+			*temp_total = _mm_add_ps(*temp_total, _mm_mul_ps(A[i][j], B[0][j]));
 				//=>把vector a1(4個float, ROWi of A 的j~j+3 column)跟vector b1(Row0 of B(該column的總和) 的j~j+3 column)相乘，再把vector a2 b2相乘，然後把vector a1b1 和vector a2b2加起來，得到vector temp
 				//先把這次計算出來的四個存起來，這row算完再把這四個的值加到c[i]裡面
 		}
 		for(int k=0; k<4; k++){
 			c[i] += temp[k];	//，把上面得到的vector temp裡的4個float + 到c[i]裡面
+			temp[k] = 0.0;
 		}
 	}
 		clock_gettime(CLOCK_MONOTONIC, &time_end);
@@ -98,7 +100,7 @@ int main(){
 	fclose(fptr);
 
 		//print using time
-	puts("C program with SIMD:");
+	puts("C program with SIMD_new:");
 	printf("\tread time:\tcompute time:\twrite time:\n");
 	for(i=0; i<3; i++){
 		time_diff[i][0] = time_diff[i][0]*1000000000+time_diff[i][1];
